@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Engineering Bootcamp · BlockseBlock</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== Header — course branding ===== -->
+  <header class="site-header">
+    <span class="logo-mark" aria-hidden="true">🌱</span>
+    <div class="titles">
+      <span class="course-title">AI Engineering Bootcamp</span>
+      <span class="org-name">BlockseBlock · Naureen Fathima</span>
+    </div>
+  </header>
+
+  <!-- ===== App body: sidebar + main (Feature 3 adds the sidebar) ===== -->
+  <div class="app-body">
+
+    <!-- ===================================================
+         FEATURE 3: Session sidebar
+         Lists past conversations; "New Chat" starts a fresh session.
+         Populated by app.js calling GET /api/sessions.
+         =================================================== -->
+    <aside class="sidebar" id="session-sidebar" aria-label="Conversation history">
+      <div class="sidebar-header">
+        <button id="new-chat-btn" class="btn btn-primary btn-full" type="button">
+          + New Chat
+        </button>
+      </div>
+      <nav id="session-list" class="session-list" aria-label="Past sessions">
+        <p class="sidebar-empty">No sessions yet.<br>Click <strong>New Chat</strong> to start.</p>
+      </nav>
+    </aside>
+
+    <!-- ===== Main content ===== -->
+    <main class="main-content">
+
+      <!-- ===================================================
+           FEATURE 4: Tab navigation (Chat | Documents)
+           Switches between the chat panel and the documents panel.
+           =================================================== -->
+      <nav class="tab-nav" role="tablist" aria-label="Feature panels">
+        <button
+          class="tab-btn active"
+          role="tab"
+          id="tab-chat"
+          data-tab="chat"
+          aria-selected="true"
+          aria-controls="chat-panel"
+        >Chat</button>
+        <button
+          class="tab-btn"
+          role="tab"
+          id="tab-documents"
+          data-tab="documents"
+          aria-selected="false"
+          aria-controls="documents-panel"
+        >Documents</button>
+        <button
+          class="tab-btn"
+          role="tab"
+          id="tab-search"
+          data-tab="search"
+          aria-selected="false"
+          aria-controls="search-panel"
+        >Ask My Documents</button>
+        <button
+          class="tab-btn"
+          role="tab"
+          id="tab-admin"
+          data-tab="admin"
+          aria-selected="false"
+          aria-controls="admin-panel"
+        >Admin</button>
+        <button
+          class="tab-btn"
+          role="tab"
+          id="tab-agent"
+          data-tab="agent"
+          aria-selected="false"
+          aria-controls="agent-panel"
+        >Agent</button>
+      </nav>
+
+      <!-- ===================================================
+           FEATURE 1 + 2: Chat panel
+           =================================================== -->
+      <section class="panel tab-panel" id="chat-panel" role="tabpanel" aria-labelledby="tab-chat">
+        <!-- Panel header with Structured Mode toggle (Feature 2) -->
+        <div class="panel-header-row">
+          <h2 class="panel-title" id="chat-panel-title">
+            Chat with your AI Assistant
+            <span class="session-label" id="session-label" hidden></span>
+          </h2>
+
+          <!-- ===================================================
+               FEATURE 2: Structured Mode toggle
+               =================================================== -->
+          <label class="toggle-label" for="structured-toggle">
+            <span class="toggle-text">Structured Mode</span>
+            <span class="toggle-wrap">
+              <input type="checkbox" id="structured-toggle" role="switch" aria-checked="false" />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </span>
+          </label>
+
+          <!-- ===================================================
+               FEATURE 6: Smart Mode toggle
+               Routes messages through /api/sessions/{id}/chat/smart
+               which classifies the query before deciding to retrieve.
+               =================================================== -->
+          <label class="toggle-label" for="smart-toggle">
+            <span class="toggle-text">Smart Mode</span>
+            <span class="toggle-wrap">
+              <input type="checkbox" id="smart-toggle" role="switch" aria-checked="false" />
+              <span class="toggle-track" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+
+        <!-- Message history -->
+        <div class="message-history" id="message-history" role="log" aria-live="polite" aria-label="Conversation">
+          <div class="empty-state" id="empty-state">
+            Start a <strong>New Chat</strong> or ask anything about <strong>[YOUR_DOMAIN]</strong>.
+          </div>
+        </div>
+
+        <!-- Input row -->
+        <div class="chat-input-row">
+          <label for="chat-input" class="sr-only">Your message</label>
+          <input
+            type="text"
+            id="chat-input"
+            class="chat-input"
+            placeholder="Type your message and press Enter…"
+            autocomplete="off"
+            autofocus
+          />
+          <button id="send-btn" class="btn btn-primary" type="button">Send</button>
+
+          <!-- ===================================================
+               FEATURE 10: Voice + Image input buttons
+               🎤 records audio via MediaRecorder → /api/voice/chat
+               📷 opens file picker (images) → /api/vision/chat
+               =================================================== -->
+          <button id="voice-btn" class="btn btn-multimodal" type="button"
+                  title="Click to record voice message (Feature 10)"
+                  aria-label="Record voice message">🎤</button>
+          <label for="image-input" class="btn btn-multimodal btn-image-label"
+                 title="Attach an image (Feature 10)"
+                 aria-label="Attach image">
+            📷
+            <input type="file" id="image-input" accept="image/*" class="sr-only" />
+          </label>
+        </div>
+
+        <!-- Voice recording status bar (shown while recording) -->
+        <div id="voice-status-bar" class="voice-status-bar" hidden>
+          <span class="voice-recording-dot" aria-hidden="true"></span>
+          <span id="voice-status-text">Recording…</span>
+          <button id="voice-stop-btn" class="btn btn-ghost btn-sm" type="button">Stop</button>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           FEATURE 4: Documents panel
+           Upload files, view status + chunk counts, inspect chunks.
+           =================================================== -->
+      <section class="panel tab-panel" id="documents-panel" role="tabpanel" aria-labelledby="tab-documents" hidden>
+        <div class="panel-header-row">
+          <h2 class="panel-title">Documents</h2>
+        </div>
+
+        <!-- Upload options row (strategy selector + CAG info) -->
+        <div class="upload-options">
+          <label for="strategy-select" class="strategy-label">Chunking strategy:</label>
+          <select id="strategy-select" class="strategy-select">
+            <option value="sentence">Sentence-aware (default)</option>
+            <option value="paragraph">Paragraph</option>
+          </select>
+          <span class="cag-trigger" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+            ℹ What is CAG?
+            <span class="cag-popover" role="tooltip">
+              <strong>CAG (Cache-Augmented Generation)</strong> skips chunking entirely — all documents
+              are loaded into one big context window and the model reads everything.
+              No vector DB, no retrieval step, zero missed chunks.
+              Works best for &lt;50 pages of stable documents.
+              RAG (what we build here) scales to many documents but requires retrieval to work correctly.
+            </span>
+          </span>
+        </div>
+
+        <!-- Upload area -->
+        <div class="upload-area" id="upload-area">
+          <input
+            type="file"
+            id="file-input"
+            accept=".txt,.pdf,.docx"
+            class="sr-only"
+          />
+          <label for="file-input" class="upload-label" id="upload-label">
+            <span class="upload-icon" aria-hidden="true">📄</span>
+            <span>Drag &amp; drop a file here, or <strong>click to upload</strong></span>
+            <span class="upload-hint">.txt · .pdf · .docx</span>
+          </label>
+          <div class="upload-progress" id="upload-progress" hidden>
+            <span class="upload-spinner" aria-hidden="true"></span>
+            <span id="upload-progress-text">Uploading…</span>
+          </div>
+        </div>
+
+        <!-- Document list -->
+        <div id="document-list" class="document-list">
+          <p class="sidebar-empty">No documents uploaded yet. Upload a file above to get started.</p>
+        </div>
+
+        <!-- Alternative architectures callout -->
+        <div class="alt-arch-callout">
+          <span class="alt-arch-icon" aria-hidden="true">🏗️</span>
+          <div class="alt-arch-body">
+            <strong>Working with long financial, legal, or technical documents?</strong>
+            Consider <a href="https://github.com/VectifyAI/PageIndex" target="_blank" rel="noopener">PageIndex</a>
+            — vectorless, reasoning-based RAG that achieved 98.7% on FinanceBench.
+            No chunking, no embeddings. See Resource 4 for when to use it.
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           FEATURE 5: Ask My Documents (semantic search panel)
+           Embeds the user's question, finds nearest chunks, shows scored results.
+           =================================================== -->
+      <section class="panel tab-panel" id="search-panel" role="tabpanel" aria-labelledby="tab-search" hidden>
+        <div class="panel-header-row">
+          <h2 class="panel-title">Ask My Documents</h2>
+        </div>
+
+        <!-- Search controls -->
+        <div class="search-controls">
+          <div class="search-input-row">
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Ask a question about your uploaded documents…"
+              autocomplete="off"
+            />
+            <select id="search-doc-filter" class="search-doc-filter">
+              <option value="">All documents</option>
+            </select>
+            <button id="search-btn" class="btn btn-primary" type="button">Search</button>
+          </div>
+        </div>
+
+        <!-- Results area -->
+        <div id="search-results" class="search-results">
+          <p class="sidebar-empty">Enter a question above and click Search.</p>
+        </div>
+
+        <!-- Honest limitations note -->
+        <div class="search-retrieval-note">
+          <strong>These are raw retrieval results — matching passages from your documents.</strong>
+          The score is a <em>similarity</em> score, not a <em>relevance</em> score.
+          A passage can be semantically close to your question without actually answering it.
+          Coming in Feature 6: the Smart Router combines these passages with LLM generation
+          to produce a synthesised answer, and decides when to skip retrieval entirely.
+        </div>
+      </section>
+
+      <!-- ===================================================
+           FEATURE 6: Admin panel
+           Part B: tenant identity + switcher
+           Part C: retrieval memory + knowledge digest
+           =================================================== -->
+      <section class="panel tab-panel" id="admin-panel" role="tabpanel" aria-labelledby="tab-admin" hidden>
+        <div class="panel-header-row">
+          <h2 class="panel-title">Admin</h2>
+        </div>
+
+        <!-- ── Week 2 Complete banner ── -->
+        <div class="week2-complete-callout">
+          <div class="week2-complete-icon" aria-hidden="true">🎓</div>
+          <div class="week2-complete-body">
+            <strong>Week 2 Complete — Full RAG Pipeline</strong>
+            <p>
+              You've built the complete pipeline: ingest (F4) → embed (F5) → route (F6).
+              The Smart Router now classifies queries before deciding to retrieve,
+              with optional multi-tenant isolation (Part B) and long-term retrieval
+              memory (Part C). Coming in Week 3: Tools, Voice, and production deployment.
+            </p>
+          </div>
+        </div>
+
+        <!-- ── Part B: Tenant identity ── -->
+        <div class="admin-section">
+          <h3 class="admin-section-title">Tenant Identity <span class="admin-part-badge">Part B</span></h3>
+          <p class="admin-section-desc">
+            Set the <code>X-Tenant-ID</code> header to switch between tenants.
+            Only active when <code>ENABLE_MULTI_TENANT=true</code> in your <code>.env</code>.
+          </p>
+          <div class="admin-tenant-row">
+            <input type="text" id="tenant-id-input" class="admin-input" placeholder="tenant-a" value="" />
+            <button id="tenant-apply-btn" class="btn btn-primary">Apply</button>
+            <button id="tenant-clear-btn" class="btn btn-ghost">Reset to default</button>
+          </div>
+          <div id="tenant-info-card" class="admin-info-card">
+            <span style="color:var(--color-pistache);font-size:0.82rem">Click Apply to check tenant info.</span>
+          </div>
+        </div>
+
+        <!-- ── Part C: Retrieval memory / Knowledge Digest ── -->
+        <div class="admin-section">
+          <h3 class="admin-section-title">Knowledge Digest <span class="admin-part-badge">Part C</span></h3>
+          <p class="admin-section-desc">
+            A 2-3 sentence LLM-generated summary of this tenant's retrieval history.
+            Once built, it's injected into the Smart Router's system prompt as persistent
+            cross-session context. Requires <code>ENABLE_LONG_TERM_CONTEXT=true</code>.
+          </p>
+          <div class="admin-digest-controls">
+            <button id="digest-rebuild-btn" class="btn btn-primary">Rebuild Digest</button>
+            <button id="digest-view-btn" class="btn btn-ghost">View Current</button>
+          </div>
+          <div id="digest-card" class="admin-info-card" hidden>
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- ── Retrieval log ── -->
+        <div class="admin-section">
+          <h3 class="admin-section-title">Recent Retrievals</h3>
+          <p class="admin-section-desc">
+            Queries that triggered document retrieval in this session.
+            This log is the raw material for the Knowledge Digest above.
+          </p>
+          <button id="retrievals-load-btn" class="btn btn-ghost">Load Recent Retrievals</button>
+          <div id="retrievals-list" class="admin-retrievals-list" hidden></div>
+        </div>
+
+        <!-- ===================================================
+             FEATURE 11: Metrics Dashboard (Part A)
+             Auto-refreshes every 5 seconds when Admin tab is open.
+             Populated by app.js calling GET /api/metrics.
+             =================================================== -->
+        <div class="admin-section">
+          <h3 class="admin-section-title">
+            Live Metrics
+            <span class="admin-part-badge">Feature 11</span>
+            <span class="metrics-refresh-dot" id="metrics-refresh-dot" title="Auto-refreshes every 5 s"></span>
+          </h3>
+          <p class="admin-section-desc">
+            Request counts, avg latency, and error rate since the server started.
+            Updated by <code>TimingMiddleware</code> on every <code>/api/*</code> call.
+            Requires the Feature 11 server.
+          </p>
+          <div class="metrics-grid" id="metrics-grid">
+            <p class="sidebar-empty" style="font-size:0.82rem">Open this tab to load metrics.</p>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             FEATURE 11: Eval Harness (Part B)
+             Runs tests/eval_cases_example.json against the live server.
+             =================================================== -->
+        <div class="admin-section">
+          <h3 class="admin-section-title">
+            Eval Harness
+            <span class="admin-part-badge">Feature 11</span>
+          </h3>
+          <p class="admin-section-desc">
+            Runs 10 Alpine Trail Co. golden test cases through the Smart Router pipeline
+            and scores each one. Uses <code>POST /api/eval/run</code>.
+            Upload documents first for accurate domain-question scoring.
+          </p>
+          <div class="eval-controls">
+            <button id="eval-run-btn" class="btn btn-primary" type="button">Run Eval</button>
+            <button id="eval-last-btn" class="btn btn-ghost" type="button">Load Last Report</button>
+          </div>
+          <div id="eval-results" class="eval-results"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           FEATURE 7: Agent panel
+           Uses the two-call tool-calling loop in shared/agent.py.
+           Shows a "🔧 Steps" audit trail for each tool invoked.
+           =================================================== -->
+      <section class="panel tab-panel" id="agent-panel" role="tabpanel" aria-labelledby="tab-agent" hidden>
+        <div class="panel-header-row">
+          <h2 class="panel-title">
+            Agent
+            <span class="panel-subtitle">uses tools to take actions, not just answer</span>
+          </h2>
+          <!-- ===================================================
+               FEATURE 8: Quick / Multi-Step mode switcher
+               Quick = Feature 7 single-turn tool-call loop.
+               Multi-Step = Feature 8 plan-and-execute loop with polling.
+               =================================================== -->
+          <div class="agent-mode-switcher" role="group" aria-label="Agent mode">
+            <button class="agent-mode-btn active" id="agent-mode-quick" data-mode="quick">Quick</button>
+            <button class="agent-mode-btn" id="agent-mode-multistep" data-mode="multistep">Multi-Step</button>
+          </div>
+        </div>
+
+        <!-- Agent requires a session — prompt if none active -->
+        <div id="agent-no-session" class="agent-no-session-notice" hidden>
+          <p>The agent needs a session to track conversation history.</p>
+          <button id="agent-create-session-btn" class="btn btn-primary" type="button">Start New Session</button>
+        </div>
+
+        <!-- ===================================================
+             FEATURE 9: Connected Services panel (MCP)
+             Collapsible — click to expand and see which MCP servers
+             are connected and what tools they expose.
+             =================================================== -->
+        <div class="mcp-services-section" id="mcp-services-section">
+          <button class="mcp-services-toggle" id="mcp-services-toggle" type="button"
+                  aria-expanded="false" aria-controls="mcp-services-body">
+            <span class="mcp-services-icon" aria-hidden="true">🔌</span>
+            <span class="mcp-services-label">Connected Services</span>
+            <span class="mcp-services-count" id="mcp-services-count"></span>
+            <span class="mcp-toggle-chevron" aria-hidden="true">▶</span>
+          </button>
+          <div class="mcp-services-body" id="mcp-services-body" hidden>
+            <div id="mcp-servers-list" class="mcp-servers-list">
+              <span class="mcp-loading">Click to load connected MCP servers…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversation history -->
+        <div class="message-history" id="agent-history" role="log" aria-live="polite" aria-label="Agent conversation">
+          <div class="empty-state" id="agent-empty-state">
+            The agent can <strong>check availability</strong>, <strong>create tickets</strong>,
+            and <strong>look up information</strong>. Try asking it to do one of these.
+            <div class="agent-example-prompts">
+              <button class="agent-example-btn" type="button">Is there an opening this Friday at 3 PM?</button>
+              <button class="agent-example-btn" type="button">I can't log in to my account</button>
+              <button class="agent-example-btn" type="button">What are your business hours?</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input row -->
+        <div class="chat-input-row">
+          <label for="agent-input" class="sr-only">Agent message</label>
+          <input
+            type="text"
+            id="agent-input"
+            class="chat-input"
+            placeholder="Ask the agent to do something…"
+            autocomplete="off"
+          />
+          <button id="agent-send-btn" class="btn btn-primary" type="button">Run</button>
+        </div>
+
+        <!-- ===================================================
+             FEATURE 9: Week 3 Complete callout
+             =================================================== -->
+        <div class="week2-complete-callout week3-agent-callout">
+          <div class="week2-complete-icon" aria-hidden="true">🎓</div>
+          <div class="week2-complete-body">
+            <strong>Week 3 Complete — Tools, Multi-Step &amp; MCP</strong>
+            <p>
+              You've built the complete "Hands" layer: single-turn tool calling (F7),
+              Plan-and-Execute agent with live polling (F8), and MCP integration (F9).
+              Your agent can plan, execute, and call any MCP-compatible tool — local or remote.
+              Coming in Week 4: Docker, production deployment, and eval harness.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           PROVIDER INFO — shows which LLM + Voice provider is active.
+           =================================================== -->
+      <section class="panel" id="provider-panel" aria-labelledby="provider-panel-title">
+        <h2 class="panel-title" id="provider-panel-title">Active Configuration</h2>
+        <div class="provider-info-card" id="provider-info-card">
+          <span>Loading provider info…</span>
+        </div>
+      </section>
+
+      <!-- ===================================================
+           FUTURE FEATURES — new panels will be added here each week.
+           =================================================== -->
+
+    </main><!-- /.main-content -->
+
+  </div><!-- /.app-body -->
+
+</div><!-- /#app -->
+
+<script src="app.js"></script>
+</body>
+</html>

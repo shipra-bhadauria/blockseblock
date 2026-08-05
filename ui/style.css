@@ -1,0 +1,2260 @@
+/* =============================================================================
+   AI Engineering Bootcamp · BlockseBlock
+   Earthy palette — grows additively; each feature adds a new section.
+   ============================================================================= */
+
+/* --- Design tokens (earthy BlockseBlock palette) --- */
+:root {
+  --color-matcha:    #809671; /* primary: buttons, active states */
+  --color-almond:    #E5E0D8; /* page background */
+  --color-pistache:  #B3B792; /* secondary: borders, icons, muted text */
+  --color-chai:      #D2AB80; /* accent / warm highlights */
+  --color-carob:     #725C3A; /* headings, strong text */
+  --color-vanilla:   #E5D2B8; /* card / surface backgrounds */
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 1px 3px rgba(114,92,58,0.10);
+  --shadow-md: 0 4px 12px rgba(114,92,58,0.12);
+
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'Menlo', monospace;
+}
+
+/* --- Reset & base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background: var(--color-almond);
+  color: var(--color-carob);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* --- App shell --- */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;       /* full viewport — sidebar + chat scroll independently */
+  overflow: hidden;
+}
+
+/* --- App body: sidebar + main side by side (Feature 3) --- */
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;       /* allows children to scroll without overflowing the viewport */
+  overflow: hidden;
+}
+
+/* --- Header --- */
+.site-header {
+  background: var(--color-matcha);
+  color: white;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-md);
+}
+
+.site-header .logo-mark {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.site-header .titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.site-header .course-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: white;
+}
+
+.site-header .org-name {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.80);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* --- Main content area --- */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+  gap: 1.5rem;
+  overflow-y: auto;
+  min-width: 0;        /* prevent flex blowout when sidebar is present */
+}
+
+/* --- Panels (each feature adds one) --- */
+.panel {
+  background: var(--color-vanilla);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+}
+
+.panel-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid var(--color-pistache);
+}
+
+/* --- Chat panel (Feature 1) --- */
+#chat-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message-history {
+  min-height: 280px;
+  max-height: 460px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.25rem;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-width: 80%;
+}
+
+.message.user  { align-self: flex-end;  align-items: flex-end; }
+.message.ai    { align-self: flex-start; align-items: flex-start; }
+
+.message .bubble {
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.message.user .bubble {
+  background: var(--color-matcha);
+  color: white;
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.message.ai .bubble {
+  background: var(--color-almond);
+  color: var(--color-carob);
+  border: 1px solid var(--color-pistache);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.message .role-label {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* typing indicator */
+.message.ai.thinking .bubble {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--color-pistache);
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-6px); }
+}
+
+/* input row */
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-md);
+  background: white;
+  font-size: 0.95rem;
+  color: var(--color-carob);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.chat-input:focus {
+  border-color: var(--color-matcha);
+}
+
+/* --- Buttons --- */
+.btn {
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--color-matcha);
+  color: white;
+}
+
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--color-vanilla);
+  color: var(--color-carob);
+  border: 1.5px solid var(--color-pistache);
+}
+
+.btn-secondary:hover { background: var(--color-almond); }
+
+/* =============================================================================
+   Feature 3: Session sidebar
+   ============================================================================= */
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--color-vanilla);
+  border-right: 1.5px solid var(--color-pistache);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 0.875rem 0.75rem;
+  border-bottom: 1.5px solid var(--color-pistache);
+}
+
+.btn-full { width: 100%; }
+
+.session-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-empty {
+  font-size: 0.82rem;
+  color: var(--color-pistache);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  line-height: 1.5;
+}
+
+/* Individual session item in the sidebar */
+.session-item {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.875rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  margin: 0 0.25rem;
+  width: calc(100% - 0.5rem);
+  transition: background 0.12s;
+}
+
+.session-item:hover {
+  background: rgba(128, 150, 113, 0.12);   /* matcha at low opacity */
+}
+
+.session-item.active {
+  background: var(--color-matcha);
+}
+
+.session-item.active .session-item-title,
+.session-item.active .session-item-meta {
+  color: white;
+}
+
+.session-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.session-item-meta {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  margin-top: 2px;
+}
+
+/* Session label shown in the chat panel header */
+.session-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-pistache);
+  margin-left: 0.5rem;
+  font-style: italic;
+}
+
+/* =============================================================================
+   Feature 2: Structured Mode — toggle, intent badges, confidence meter
+   ============================================================================= */
+
+/* Panel header row (title + toggle side by side) */
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid var(--color-pistache);
+}
+
+/* Remove the margin-bottom from panel-title when it sits inside a header row */
+.panel-header-row .panel-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Toggle (custom checkbox styled as a pill switch) */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-text {
+  font-size: 0.82rem;
+  color: var(--color-carob);
+  font-weight: 500;
+}
+
+.toggle-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toggle-wrap input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.toggle-track {
+  display: block;
+  width: 40px;
+  height: 22px;
+  background: var(--color-pistache);
+  border-radius: 99px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.toggle-wrap input:checked ~ .toggle-track {
+  background: var(--color-matcha);
+}
+
+.toggle-wrap input:checked ~ .toggle-track::after {
+  transform: translateX(18px);
+}
+
+.toggle-wrap input:focus-visible ~ .toggle-track {
+  outline: 2px solid var(--color-matcha);
+  outline-offset: 2px;
+}
+
+/* --- Structured response card --- */
+.response-card {
+  background: var(--color-almond);
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.response-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Intent badges — one earthy color per intent */
+.intent-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.intent-badge[data-intent="domain_question"]  { background: var(--color-matcha);   color: white; }
+.intent-badge[data-intent="general_question"] { background: var(--color-chai);     color: var(--color-carob); }
+.intent-badge[data-intent="action_request"]   { background: var(--color-pistache); color: white; }
+.intent-badge[data-intent="unclear"]          {
+  background: transparent;
+  color: var(--color-carob);
+  border: 1.5px solid var(--color-carob);
+}
+
+/* Confidence meter */
+.confidence-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.confidence-label {
+  font-size: 0.75rem;
+  color: var(--color-pistache);
+  white-space: nowrap;
+}
+
+.confidence-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--color-pistache);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.confidence-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--color-matcha);
+  transition: width 0.4s ease;
+}
+
+/* Fill color changes at low confidence */
+.confidence-bar-fill[data-level="low"]    { background: var(--color-chai); }
+.confidence-bar-fill[data-level="medium"] { background: var(--color-pistache); }
+.confidence-bar-fill[data-level="high"]   { background: var(--color-matcha); }
+
+.confidence-pct {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+/* Sources needed indicator */
+.sources-tag {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  font-style: italic;
+}
+
+/* Answer text inside a card */
+.response-card-answer {
+  font-size: 0.95rem;
+  color: var(--color-carob);
+  line-height: 1.6;
+}
+
+/* --- Provider info card (added by multi-provider feature) --- */
+.provider-info-card {
+  background: var(--color-almond);
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-carob);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.provider-info-card .badge {
+  background: var(--color-matcha);
+  color: white;
+  padding: 0.15rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* --- Empty state --- */
+.empty-state {
+  text-align: center;
+  color: var(--color-pistache);
+  padding: 2rem;
+  font-size: 0.95rem;
+}
+
+/* --- Scrollbar (subtle) --- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-pistache);
+  border-radius: 99px;
+}
+
+/* --- Utility --- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* =============================================================================
+   Feature 4: Tab navigation + Documents panel
+   ============================================================================= */
+
+/* Tab navigation bar */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--color-pistache);
+  margin-bottom: 0;
+  padding: 0 0.25rem;
+}
+
+.tab-btn {
+  padding: 0.55rem 1.25rem;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-pistache);
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.tab-btn:hover {
+  color: var(--color-carob);
+  background: rgba(128,150,113,0.08);
+}
+
+.tab-btn.active,
+.tab-btn[aria-selected="true"] {
+  color: var(--color-matcha);
+  border-bottom-color: var(--color-matcha);
+  background: transparent;
+}
+
+/* Tab panels — hidden by default; JS toggles `hidden` attribute */
+.tab-panel[hidden] { display: none !important; }
+
+/* Upload options row (strategy selector + CAG info) */
+.upload-options {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.strategy-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  white-space: nowrap;
+}
+
+.strategy-select {
+  padding: 0.35rem 0.75rem;
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-size: 0.85rem;
+  color: var(--color-carob);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.strategy-select:focus {
+  border-color: var(--color-matcha);
+}
+
+/* CAG info trigger + popover */
+.cag-trigger {
+  position: relative;
+  font-size: 0.8rem;
+  color: var(--color-pistache);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px dotted var(--color-pistache);
+  padding-bottom: 1px;
+}
+
+.cag-trigger:hover,
+.cag-trigger:focus {
+  color: var(--color-carob);
+  outline: none;
+}
+
+.cag-popover {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 280px;
+  background: var(--color-carob);
+  color: white;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  font-weight: 400;
+}
+
+.cag-popover::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 12px;
+  border: 6px solid transparent;
+  border-top-color: var(--color-carob);
+}
+
+.cag-trigger:hover .cag-popover,
+.cag-trigger:focus .cag-popover,
+.cag-trigger[aria-expanded="true"] .cag-popover {
+  display: block;
+}
+
+/* Alternative architectures callout */
+.alt-arch-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+  background: color-mix(in srgb, var(--almond) 60%, var(--pistache) 40%);
+  border-left: 3px solid var(--carob);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  color: var(--carob);
+  line-height: 1.45;
+}
+
+.alt-arch-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  margin-top: 0.05rem;
+}
+
+.alt-arch-body a {
+  color: var(--carob);
+  font-weight: 600;
+}
+
+.alt-arch-body a:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+/* Strategy tag on document cards */
+.strategy-tag {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--color-almond);
+  color: var(--color-pistache);
+  border: 1px solid var(--color-pistache);
+  flex-shrink: 0;
+}
+
+/* Upload area */
+.upload-area {
+  border: 2px dashed var(--color-pistache);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+
+.upload-area:hover,
+.upload-area.drag-over {
+  border-color: var(--color-matcha);
+  background: rgba(128,150,113,0.06);
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-carob);
+}
+
+.upload-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.upload-hint {
+  font-size: 0.78rem;
+  color: var(--color-pistache);
+}
+
+/* Upload progress */
+.upload-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-carob);
+}
+
+.upload-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-pistache);
+  border-top-color: var(--color-matcha);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Document list */
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Individual document card */
+.document-card {
+  background: var(--color-almond);
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.document-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+.document-card-header:hover {
+  background: rgba(128,150,113,0.08);
+}
+
+.document-card-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-card-meta {
+  font-size: 0.78rem;
+  color: var(--color-pistache);
+  white-space: nowrap;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.status-badge[data-status="ready"]      { background: var(--color-matcha);  color: white; }
+.status-badge[data-status="processing"] { background: var(--color-chai);    color: var(--color-carob); }
+.status-badge[data-status="error"]      { background: #b85c4a;              color: white; }
+
+/* Delete button */
+.btn-delete {
+  background: transparent;
+  border: 1.5px solid var(--color-pistache);
+  color: var(--color-pistache);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.btn-delete:hover {
+  border-color: #b85c4a;
+  color: #b85c4a;
+}
+
+/* Chunk list (expanded view) */
+.chunk-list {
+  border-top: 1.5px solid var(--color-pistache);
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.chunk-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(179,183,146,0.3);
+}
+
+.chunk-item:last-child { border-bottom: none; }
+
+.chunk-index {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-pistache);
+  min-width: 1.5rem;
+  padding-top: 2px;
+}
+
+.chunk-preview {
+  font-size: 0.82rem;
+  color: var(--color-carob);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* =============================================================================
+   Feature 5: Ask My Documents (semantic search)
+   ============================================================================= */
+
+/* Search controls row */
+.search-controls {
+  margin-bottom: 1rem;
+}
+
+.search-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.875rem;
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--color-carob);
+  background: white;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus {
+  border-color: var(--color-matcha);
+}
+
+.search-doc-filter {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--color-carob);
+  background: white;
+  cursor: pointer;
+  outline: none;
+  max-width: 180px;
+  transition: border-color 0.15s;
+}
+
+.search-doc-filter:focus {
+  border-color: var(--color-matcha);
+}
+
+/* Thinking/loading state */
+.search-thinking {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  font-size: 0.85rem;
+  color: var(--color-pistache);
+}
+
+/* Results list */
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+/* Individual result card */
+.search-result-card {
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--color-almond);
+  background: white;
+  transition: border-color 0.15s;
+}
+
+.search-result-card[data-score-level="high"] {
+  border-color: var(--color-matcha);
+  background: rgba(128,150,113,0.04);
+}
+
+.search-result-card[data-score-level="medium"] {
+  border-color: var(--color-chai);
+  background: rgba(210,171,128,0.06);
+}
+
+.search-result-card[data-score-level="low"] {
+  border-color: #ccc;
+}
+
+.result-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.result-filename-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: white;
+  background: var(--color-carob);
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-chunk-meta {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  white-space: nowrap;
+}
+
+.result-score-badge {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.result-score-badge[data-level="high"]   { background: var(--color-matcha); color: white; }
+.result-score-badge[data-level="medium"] { background: var(--color-chai); color: var(--color-carob); }
+.result-score-badge[data-level="low"]    { background: #e0e0e0; color: #666; }
+
+.result-text {
+  font-size: 0.85rem;
+  color: var(--color-carob);
+  line-height: 1.55;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Honest limitations note */
+.search-retrieval-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-almond);
+  border-left: 3px solid var(--color-chai);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: var(--color-carob);
+  line-height: 1.5;
+}
+
+/* =============================================================================
+   Feature 6: Smart Router
+   ============================================================================= */
+
+/* Smart Mode toggle — identical markup to Structured Mode, no extra CSS needed */
+
+/* Source badges: llm / rag / hybrid / pageindex */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.source-badge[data-source="llm"] {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.source-badge[data-source="rag"] {
+  background: rgba(128,150,113,0.18);
+  color: var(--color-matcha);
+  border: 1px solid var(--color-matcha);
+}
+
+.source-badge[data-source="hybrid"] {
+  background: rgba(210,171,128,0.20);
+  color: #92600a;
+  border: 1px solid var(--color-chai);
+}
+
+.source-badge[data-source="pageindex"] {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+/* Smart response card */
+.smart-response-card {
+  background: white;
+  border: 1px solid var(--color-almond);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  max-width: 680px;
+  box-shadow: var(--shadow-sm);
+}
+
+.smart-response-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+/* Collapsed chunk list toggle */
+.smart-chunks-toggle {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--color-pistache);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  text-decoration: underline dotted;
+}
+
+.smart-chunks-toggle:hover { color: var(--color-carob); }
+
+.smart-chunks-container {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.smart-chunk-item {
+  padding: 0.6rem 0.75rem;
+  background: var(--color-almond);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+}
+
+.smart-chunk-item .result-filename-badge,
+.smart-chunk-item .result-chunk-meta,
+.smart-chunk-item .result-score-badge {
+  margin-right: 0.4rem;
+}
+
+.smart-chunk-item .result-text {
+  margin-top: 0.35rem;
+}
+
+/* =============================================================================
+   Feature 6: Admin panel
+   ============================================================================= */
+
+/* Week 2 Complete banner */
+.week2-complete-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(128,150,113,0.12), rgba(210,171,128,0.12));
+  border: 1.5px solid var(--color-matcha);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.week2-complete-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.week2-complete-body strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--color-carob);
+  margin-bottom: 0.35rem;
+}
+
+.week2-complete-body p {
+  font-size: 0.85rem;
+  color: var(--color-carob);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Admin section layout */
+.admin-section {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-almond);
+}
+
+.admin-section:last-child { border-bottom: none; }
+
+.admin-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-carob);
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.admin-part-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  background: var(--color-vanilla);
+  border: 1px solid var(--color-pistache);
+  border-radius: 99px;
+  color: var(--color-pistache);
+  letter-spacing: 0.02em;
+}
+
+.admin-section-desc {
+  font-size: 0.82rem;
+  color: #777;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.admin-section-desc code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--color-almond);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+/* Tenant switcher row */
+.admin-tenant-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.admin-input {
+  flex: 1;
+  min-width: 160px;
+  max-width: 280px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: white;
+  color: var(--color-carob);
+}
+
+.admin-input:focus {
+  outline: 2px solid var(--color-matcha);
+  outline-offset: 1px;
+}
+
+.btn-ghost {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-carob);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-ghost:hover { background: var(--color-almond); }
+
+/* Admin info card (tenant info, digest) */
+.admin-info-card {
+  padding: 0.75rem 1rem;
+  background: var(--color-almond);
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--color-carob);
+}
+
+.admin-info-card code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+/* Digest controls */
+.admin-digest-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+/* Knowledge Digest content */
+.digest-summary {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-carob);
+  margin-bottom: 0.5rem;
+}
+
+.digest-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.digest-topic-tag {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  background: rgba(128,150,113,0.15);
+  border: 1px solid var(--color-matcha);
+  border-radius: 99px;
+  color: var(--color-matcha);
+  font-weight: 600;
+}
+
+.digest-meta {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+}
+
+/* Retrieval log */
+.admin-retrievals-list {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.retrieval-log-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.45rem 0.7rem;
+  background: var(--color-almond);
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.retrieval-method-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.retrieval-query {
+  font-size: 0.83rem;
+  color: var(--color-carob);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.retrieval-meta {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   Feature 7: Agent panel
+   ============================================================================= */
+
+/* Panel subtitle */
+.panel-subtitle {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-pistache);
+  margin-left: 0.5rem;
+}
+
+/* No-session notice */
+.agent-no-session-notice {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--color-vanilla);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  color: var(--color-carob);
+}
+
+.agent-no-session-notice p { margin-bottom: 0.75rem; }
+
+/* Example prompt buttons */
+.agent-example-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.agent-example-btn {
+  background: white;
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.85rem;
+  font-size: 0.84rem;
+  color: var(--color-carob);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.agent-example-btn:hover {
+  border-color: var(--color-matcha);
+  background: rgba(128,150,113,0.06);
+}
+
+/* Agent response card */
+.agent-response-card {
+  background: white;
+  border: 1px solid var(--color-almond);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  max-width: 680px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tools used badges (compact header) */
+.agent-tools-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.55rem;
+}
+
+.agent-tool-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  background: rgba(114,92,58,0.10);
+  border: 1px solid var(--color-chai);
+  color: var(--color-carob);
+  white-space: nowrap;
+}
+
+/* Steps toggle */
+.agent-steps-toggle {
+  display: inline-block;
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  color: var(--color-pistache);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  text-decoration: underline dotted;
+}
+
+.agent-steps-toggle:hover { color: var(--color-carob); }
+
+/* Steps container */
+.agent-steps-container {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.65rem;
+  background: var(--color-almond);
+  border-radius: var(--radius-sm);
+}
+
+/* Individual step */
+.agent-step {
+  background: white;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--color-chai);
+}
+
+.agent-step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.agent-step-num {
+  font-size: 0.68rem;
+  font-weight: 700;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--color-carob);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.agent-step-tool {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-carob);
+}
+
+.agent-step-args {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--color-almond);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.6rem;
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--color-carob);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.agent-step-result {
+  font-size: 0.8rem;
+}
+
+.agent-step-result-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-pistache);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.agent-step-result-pre {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(128,150,113,0.08);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.6rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--color-carob);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* =============================================================================
+   Feature 8: Multi-Step Agent — mode switcher + task progress card
+   ============================================================================= */
+
+/* ── Mode switcher (Quick / Multi-Step) ── */
+.agent-mode-switcher {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.agent-mode-btn {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  color: var(--color-pistache);
+  transition: background 0.15s, color 0.15s;
+}
+
+.agent-mode-btn:first-child {
+  border-right: 1.5px solid var(--color-pistache);
+}
+
+.agent-mode-btn.active {
+  background: var(--color-matcha);
+  color: white;
+}
+
+.agent-mode-btn:hover:not(.active) {
+  background: var(--color-vanilla);
+  color: var(--color-carob);
+}
+
+/* ── Task progress card ── */
+.agent-task-card {
+  background: var(--color-vanilla);
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 260px;
+  max-width: 520px;
+}
+
+/* Status line */
+.agent-task-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-pistache);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agent-task-spinner {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--color-pistache);
+  border-top-color: var(--color-matcha);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.agent-task-spinner[hidden] {
+  display: none;
+}
+
+/* Plan ordered list */
+.agent-task-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.agent-task-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+  font-size: 0.85rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.agent-task-step.pending {
+  border-left-color: var(--color-pistache);
+  opacity: 0.55;
+}
+
+.agent-task-step.active {
+  background: rgba(210, 171, 128, 0.18);
+  border-left-color: var(--color-chai);
+}
+
+.agent-task-step.done {
+  background: rgba(128, 150, 113, 0.12);
+  border-left-color: var(--color-matcha);
+}
+
+.agent-task-step-label {
+  font-weight: 600;
+  color: var(--color-carob);
+}
+
+.agent-task-step.pending .agent-task-step-label {
+  color: var(--color-pistache);
+}
+
+.agent-task-step-result {
+  font-size: 0.8rem;
+  color: var(--color-carob);
+  padding: 0.3rem 0.5rem;
+  background: rgba(255,255,255,0.5);
+  border-radius: var(--radius-sm);
+  margin-top: 0.15rem;
+}
+
+/* Final result card */
+.agent-task-result {
+  background: rgba(128, 150, 113, 0.12);
+  border: 1px solid rgba(128, 150, 113, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.agent-task-result[hidden] { display: none; }
+
+.agent-task-result-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-matcha);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.agent-task-result-text {
+  font-size: 0.9rem;
+  color: var(--color-carob);
+  line-height: 1.55;
+}
+
+/* Error box */
+.agent-task-error {
+  background: rgba(176, 74, 64, 0.10);
+  border: 1px solid rgba(176, 74, 64, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.84rem;
+  color: #7a2f28;
+}
+
+.agent-task-error[hidden] { display: none; }
+
+/* =============================================================================
+   Feature 9: MCP Connected Services panel + source tags + Week 3 callout
+   ============================================================================= */
+
+/* ── Connected Services collapsible section ── */
+.mcp-services-section {
+  border: 1px solid var(--color-pistache);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.mcp-services-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  background: var(--color-almond);
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-carob);
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.mcp-services-toggle:hover {
+  background: rgba(210, 171, 128, 0.25);
+}
+
+.mcp-services-icon {
+  font-size: 0.85rem;
+}
+
+.mcp-services-label {
+  flex: 1;
+}
+
+.mcp-services-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: var(--color-matcha);
+  color: white;
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+}
+
+.mcp-toggle-chevron {
+  font-size: 0.6rem;
+  color: var(--color-pistache);
+}
+
+.mcp-services-body {
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid var(--color-pistache);
+}
+
+.mcp-servers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mcp-loading {
+  font-size: 0.78rem;
+  color: var(--color-pistache);
+}
+
+/* ── Individual server card ── */
+.mcp-server-card {
+  background: var(--color-vanilla);
+  border: 1px solid rgba(128, 150, 113, 0.22);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mcp-server-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.mcp-status-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mcp-status-dot.connected { background: var(--color-matcha); }
+.mcp-status-dot.error     { background: #b04a40; }
+
+.mcp-server-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-carob);
+  font-family: var(--font-mono);
+}
+
+.mcp-transport-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--color-pistache);
+  border: 1px solid var(--color-pistache);
+  border-radius: 99px;
+  padding: 0.05rem 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mcp-tool-count {
+  font-size: 0.7rem;
+  color: var(--color-pistache);
+  margin-left: auto;
+}
+
+.mcp-server-desc {
+  font-size: 0.76rem;
+  color: var(--color-carob);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Tool list inside server card ── */
+.mcp-tool-list {
+  list-style: none;
+  padding: 0.35rem 0 0;
+  margin: 0.1rem 0 0;
+  border-top: 1px solid rgba(128, 150, 113, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mcp-tool-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+}
+
+.mcp-tool-name {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-carob);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mcp-tool-desc {
+  color: var(--color-pistache);
+  font-size: 0.73rem;
+  line-height: 1.3;
+}
+
+/* ── Source tag on tool badges and step headers ── */
+.agent-source-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.06rem 0.32rem;
+  border-radius: 99px;
+  background: rgba(128, 150, 113, 0.15);
+  color: var(--color-matcha);
+  letter-spacing: 0.03em;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+/* ── Week 3 Complete callout (in Agent panel) ── */
+.week3-agent-callout {
+  margin-top: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   Feature 10: Multimodal AI — Voice (Part A) + Vision (Part B)
+   ============================================================================= */
+
+/* ── Voice / Image buttons in the chat input row ── */
+.btn-multimodal {
+  flex-shrink: 0;
+  padding: 0 0.6rem;
+  height: 2.25rem;
+  border: 1.5px solid var(--color-almond);
+  border-radius: var(--radius);
+  background: var(--color-almond);
+  color: var(--color-carob);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-multimodal:hover {
+  background: var(--color-vanilla);
+  border-color: var(--color-chai);
+}
+
+.btn-multimodal:active { transform: scale(0.95); }
+
+/* Active recording state — pulse red border */
+.btn-multimodal.recording {
+  border-color: #c0392b;
+  background: rgba(192, 57, 43, 0.08);
+  animation: pulse-border 1s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: #c0392b; }
+  50%       { border-color: rgba(192, 57, 43, 0.35); }
+}
+
+/* The image label acts as a file-input trigger */
+.btn-image-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Voice status bar (shown while recording) ── */
+.voice-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(192, 57, 43, 0.06);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: var(--radius);
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  color: #c0392b;
+}
+
+.voice-recording-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #c0392b;
+  flex-shrink: 0;
+  animation: blink-dot 1s step-end infinite;
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+/* ── Image attachment in user bubble ── */
+.bubble.image-bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.vision-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-almond);
+  flex-shrink: 0;
+}
+
+.vision-filename {
+  font-size: 0.8rem;
+  color: var(--color-carob);
+  word-break: break-all;
+}
+
+/* ── Vision response card ── */
+.vision-response-card {
+  background: var(--color-almond);
+  border: 1.5px solid var(--color-chai);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  max-width: 640px;
+}
+
+.vision-response-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* VLM badge — distinguishes vision responses from text responses */
+.vlm-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.42rem;
+  border-radius: 99px;
+  background: rgba(128, 150, 113, 0.18);
+  color: var(--color-matcha);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.vision-model-tag {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--color-pistache);
+}
+
+/* =============================================================================
+   Feature 11: Production Design — Metrics Dashboard + Eval Harness
+   ============================================================================= */
+
+/* ── Metrics refresh indicator dot ── */
+.metrics-refresh-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-pistache);
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+.metrics-refresh-dot.active {
+  background: var(--color-matcha);
+}
+
+/* ── Metrics grid: 4 cards in a 2×2 grid ── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 540px) {
+  .metrics-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.metric-card {
+  background: var(--color-vanilla);
+  border: 1.5px solid rgba(128, 150, 113, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.metric-card[data-level="high"] {
+  border-color: rgba(192, 57, 43, 0.4);
+  background: rgba(192, 57, 43, 0.05);
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-carob);
+  line-height: 1.1;
+}
+
+.metric-label {
+  font-size: 0.72rem;
+  color: var(--color-pistache);
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Eval controls row ── */
+.eval-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Eval results container ── */
+.eval-results {
+  margin-top: 0.25rem;
+}
+
+.eval-running {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  color: var(--color-pistache);
+  padding: 0.5rem 0;
+}
+
+/* ── Eval summary row (score + pass rate badge + timestamp) ── */
+.eval-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.eval-summary-score {
+  font-size: 1rem;
+  color: var(--color-carob);
+}
+
+.eval-pass-rate-badge {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 99px;
+  background: var(--color-pistache);
+  color: white;
+}
+
+.eval-pass-rate-badge[data-level="high"]   { background: var(--color-matcha); }
+.eval-pass-rate-badge[data-level="medium"] { background: var(--color-chai); color: var(--color-carob); }
+.eval-pass-rate-badge[data-level="low"]    { background: #c0392b; }
+
+.eval-ran-at {
+  font-size: 0.76rem;
+  color: var(--color-pistache);
+  margin-left: auto;
+}
+
+/* ── Pass rate bar ── */
+.eval-bar-track {
+  height: 0.5rem;
+  background: rgba(128, 150, 113, 0.18);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.eval-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Eval case table ── */
+.eval-case-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.eval-case-table th {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-pistache);
+  border-bottom: 1.5px solid rgba(128, 150, 113, 0.2);
+}
+
+.eval-case-table td {
+  padding: 0.35rem 0.5rem;
+  vertical-align: top;
+  border-bottom: 1px solid rgba(128, 150, 113, 0.12);
+}
+
+.eval-row-pass { background: rgba(128, 150, 113, 0.04); }
+.eval-row-fail { background: rgba(192, 57, 43, 0.04); }
+
+.eval-case-id {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--color-pistache);
+}
+
+.eval-question-cell {
+  max-width: 200px;
+  color: var(--color-carob);
+}
+
+/* ── Intent and source tags inside eval table ── */
+.eval-intent-tag, .eval-source-tag {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 0.08rem 0.38rem;
+  border-radius: 99px;
+  background: rgba(128, 150, 113, 0.15);
+  color: var(--color-matcha);
+  white-space: nowrap;
+}
+
+.eval-source-tag[data-source="rag"]    { background: rgba(128, 150, 113, 0.2); color: var(--color-matcha); }
+.eval-source-tag[data-source="hybrid"] { background: rgba(210, 171, 128, 0.25); color: #8a6022; }
+.eval-source-tag[data-source="llm"]    { background: rgba(179, 183, 146, 0.25); color: var(--color-carob); }
+
+/* ── Pass / Fail badges ── */
+.eval-pass-badge, .eval-fail-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.08rem 0.38rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.eval-pass-badge { background: rgba(128, 150, 113, 0.2); color: var(--color-matcha); }
+.eval-fail-badge { background: rgba(192, 57, 43, 0.15); color: #c0392b; }
+
+/* ── Failure detail line below FAIL badge ── */
+.eval-fail-details {
+  font-size: 0.66rem;
+  color: #c0392b;
+  margin-top: 0.15rem;
+  line-height: 1.3;
+  word-break: break-word;
+}

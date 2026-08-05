@@ -23,7 +23,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[0]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from shared.llm_client import call_llm
 from shared.provider_check import check_provider_config
@@ -128,6 +128,6 @@ async def provider_info():
     }
 
 
-_ui_path = Path(__file__).resolve().parents[3] / "ui"
+_ui_path = Path(__file__).resolve().parents[2] / "ui"
 if _ui_path.exists():
     app.mount("/", StaticFiles(directory=str(_ui_path), html=True), name="ui")
