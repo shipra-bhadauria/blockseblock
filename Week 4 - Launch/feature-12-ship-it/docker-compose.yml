@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# docker-compose.yml — AI Engineering Bootcamp (BlockseBlock) · Feature 12
+#
+# YOUR TASK: Fill in the three TODO sections below.
+#   TODO 1 — map port 8000 on the host to port 8000 in the container
+#   TODO 2 — mount named volumes so the vector DB and uploads survive restarts
+#   TODO 3 — add a Docker healthcheck that calls GET /api/health
+#
+# Run:
+#   cd week-4-launch/feature-12-ship-it/
+#   docker compose up --build
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: "Week 4 - Launch/feature-12-ship-it/Dockerfile"
+
+    # TODO 1: Map host port 8000 to container port 8000.
+    #   Format:  ports:
+    #              - "HOST_PORT:CONTAINER_PORT"
+    #
+    # YOUR CODE HERE
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ../../.env
+
+    environment:
+      - VECTOR_DB_PATH=/data/chroma
+
+    # TODO 2: Mount named volumes for persistent data.
+    #   The vector DB lives at /data/chroma inside the container.
+    #   Uploaded files live at /data/uploads inside the container.
+    #
+    #   Format:  volumes:
+    #              - volume_name:/path/inside/container
+    #
+    #   Use the volume names defined at the bottom of this file:
+    #     chroma_data   → /data/chroma
+    #     uploads_data  → /data/uploads
+    #
+    # YOUR CODE HERE
+    volumes:
+        - chroma_data:/data/chroma
+        - uploads_data:/data/uploads
+
+    # TODO 3: Add a Docker healthcheck.
+    #   Docker should call GET http://localhost:8000/api/health every 30 seconds.
+    #   If it fails 3 times in a row, mark the container "unhealthy".
+    #   Give the app 20 seconds to boot before checks begin (start_period).
+    #
+    #   Format:  healthcheck:
+    #              test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+    #              interval: ???
+    #              timeout: ???
+    #              retries: ???
+    #              start_period: ???
+    #
+    # YOUR CODE HERE
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+        interval: 30s
+        timeout: 10s
+        retries : 3
+        start_period : 20s
+
+    restart: unless-stopped
+
+# Named volumes — Docker manages these on the host machine.
+# To wipe all data: docker compose down -v
+volumes:
+  chroma_data:
+  uploads_data:

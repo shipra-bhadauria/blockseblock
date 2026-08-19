@@ -1,0 +1,72 @@
+[
+  {
+    "id": "gen-001",
+    "question": "What is down fill power and why does it matter for sleeping bags?",
+    "expected_intent": "general_question",
+    "expected_source": "llm",
+    "expected_answer_contains": ["warmth", "insulation"]
+  },
+  {
+    "id": "gen-002",
+    "question": "How should I break in new hiking boots before a long trail?",
+    "expected_intent": "general_question",
+    "expected_source": "llm",
+    "expected_answer_contains": ["wear", "blister"]
+  },
+  {
+    "id": "gen-003",
+    "question": "What is the difference between DWR coating and a waterproof membrane?",
+    "expected_intent": "general_question",
+    "expected_source": "llm",
+    "expected_answer_contains": ["water", "membrane"]
+  },
+  {
+    "id": "dom-001",
+    "question": "What hiking boots do you carry for wide feet?",
+    "expected_intent": "domain_question",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "dom-002",
+    "question": "What is Alpine Trail Co.'s return policy on worn gear?",
+    "expected_intent": "domain_question",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "dom-003",
+    "question": "Do you stock technical climbing harnesses?",
+    "expected_intent": "domain_question",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "dom-004",
+    "question": "Which backpacks do you recommend for a 5-day backcountry trip?",
+    "expected_intent": "domain_question",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "act-001",
+    "question": "I need to exchange my hiking jacket for a different size.",
+    "expected_intent": "action_request",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "act-002",
+    "question": "Please create a support ticket for my broken trekking pole tip.",
+    "expected_intent": "action_request",
+    "expected_source": null,
+    "expected_answer_contains": []
+  },
+  {
+    "id": "unc-001",
+    "question": "hmm",
+    "expected_intent": "unclear",
+    "expected_source": null,
+    "expected_answer_contains": []
+  }
+]
