@@ -18,7 +18,7 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /build
 
-COPY blockseblock-ai-bootcamp/requirements.txt .
+COPY requirements.txt .
 
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
